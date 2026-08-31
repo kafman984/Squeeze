@@ -3,9 +3,120 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Squeeze — Resize & Compress Images</title>
+
+<title>Squeeze — Free Online Image Resizer & Compressor (No Upload)</title>
+<meta name="description" content="Resize and compress JPG, PNG, and WebP photos for free, right in your browser. No uploads, no sign-up, nothing stored — just smaller files, instantly.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://YOURDOMAIN.com/">
+<meta name="theme-color" content="#5b4fff">
+<meta name="author" content="Squeeze">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Squeeze — Free Online Image Resizer & Compressor">
+<meta property="og:description" content="Resize and compress photos for free, right in your browser. No uploads, no sign-up, nothing stored.">
+<meta property="og:url" content="https://YOURDOMAIN.com/">
+<meta property="og:image" content="https://YOURDOMAIN.com/og-image.png">
+<meta property="og:site_name" content="Squeeze">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Squeeze — Free Online Image Resizer & Compressor">
+<meta name="twitter:description" content="Resize and compress photos for free, right in your browser. No uploads, no sign-up, nothing stored.">
+<meta name="twitter:image" content="https://YOURDOMAIN.com/og-image.png">
+
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+<!-- Structured data: describes the tool itself -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Squeeze",
+  "url": "https://YOURDOMAIN.com/",
+  "applicationCategory": "MultimediaApplication",
+  "operatingSystem": "Any (runs in any modern browser)",
+  "browserRequirements": "Requires JavaScript",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "description": "Free browser-based tool to resize and compress JPG, PNG, and WebP images without uploading them to a server. Adjust quality with a live slider and see the exact file size before downloading.",
+  "featureList": [
+    "Batch resize multiple images at once",
+    "Live quality slider with real-time file size preview",
+    "Convert between JPEG, PNG, and WebP",
+    "Download as a ZIP or individually",
+    "Runs entirely client-side — nothing is uploaded or stored"
+  ]
+}
+</script>
+
+<!-- Structured data: FAQ, mirrors the visible FAQ section below -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Is Squeeze really free?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. There's no sign-up, no watermark, no limit on how many images you can process, and no hidden paywall."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do you upload or store my photos?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Every image is resized and compressed locally in your browser using JavaScript. Nothing is ever sent to a server, and nothing is stored after you close the tab."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What does \"max dimension\" mean?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "It's the longest side of the photo, whichever is bigger — width or height. If you set it to 1500px, a 4000x3000 photo becomes 1500x1125."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Will resizing reduce the image quality?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Some quality loss is unavoidable when a file gets smaller. The quality slider lets you control that trade-off directly and shows the resulting file size live, so you can stop wherever it still looks right."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What image formats are supported?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "You can upload JPG, PNG, and WebP files, and export the result as JPEG, PNG, or WebP."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I use this on my phone?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, the tool is fully responsive and works on mobile browsers. You can download results as a single ZIP or as separate files."
+      }
+    }
+  ]
+}
+</script>
+
 <style>
   :root{
     --bg:#f6f5f2;
@@ -218,6 +329,12 @@
     cursor:pointer;
   }
   .dial input[type="number"]{ cursor:text; }
+  .dial-caption{
+    font-size:10.5px;
+    color:var(--muted);
+    line-height:1.4;
+    margin-top:7px;
+  }
 
   /* Range slider */
   .dial input[type="range"]{
@@ -383,7 +500,7 @@
 
   /* Actions */
   .actions{ width:100%; display:flex; gap:10px; flex-wrap:wrap; }
-  #downloadAll, #clearAll{
+  #downloadAll, #downloadSeparate, #clearAll{
     font-family:'Inter', sans-serif;
     font-weight:600;
     font-size:14px;
@@ -400,20 +517,142 @@
   }
   #downloadAll:hover:not(:disabled){ transform:translateY(-1px); box-shadow:0 10px 26px rgba(91,79,255,0.36); }
   #downloadAll:disabled{ background:#e4e3df; color:var(--muted); box-shadow:none; cursor:not-allowed; }
-  #clearAll{
+  .ghost-btn{
     background:#fff;
     color:var(--muted);
     border:1px solid var(--glass-border);
   }
-  #clearAll:hover{ color:var(--ink); }
+  .ghost-btn:hover:not(:disabled){ color:var(--ink); }
+  .ghost-btn:disabled{ color:#c7c6c1; cursor:not-allowed; }
 
   .footer-note{
     width:100%;
-    margin-top:36px;
+    margin-top:8px;
     font-size:12.5px;
     color:var(--muted);
     text-align:left;
     line-height:1.6;
+  }
+
+  .support-card{
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:16px;
+    background:var(--violet-soft);
+    border:1px solid rgba(91,79,255,0.14);
+    border-radius:var(--radius-lg);
+    padding:20px 24px;
+    margin-top:28px;
+  }
+  .support-card p{
+    margin:0;
+    font-size:13.5px;
+    color:var(--ink);
+    line-height:1.55;
+    max-width:44ch;
+  }
+
+  .idea-link{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    font-size:13.5px;
+    font-weight:600;
+    color:var(--muted);
+    text-decoration:none;
+    margin-top:20px;
+    transition:color .15s ease;
+  }
+  .idea-link:hover{ color:var(--violet); }
+
+  /* How it works / FAQ sections */
+  .info-section{
+    width:100%;
+    margin-top:52px;
+    padding-top:36px;
+    border-top:1px solid var(--glass-border);
+  }
+  .info-section h2{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:22px;
+    letter-spacing:-0.01em;
+    margin:0 0 22px;
+  }
+  .steps{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:16px;
+  }
+  .step{
+    background:#fff;
+    border:1px solid var(--glass-border);
+    border-radius:var(--radius-md);
+    padding:18px;
+  }
+  .step-num{
+    width:26px; height:26px;
+    border-radius:50%;
+    background:var(--violet-soft);
+    color:var(--violet);
+    font-family:'JetBrains Mono', monospace;
+    font-weight:700;
+    font-size:12.5px;
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom:12px;
+  }
+  .step h3{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:15px;
+    font-weight:600;
+    margin:0 0 6px;
+  }
+  .step p{
+    font-size:13.5px;
+    color:var(--muted);
+    line-height:1.5;
+    margin:0;
+  }
+
+  .faq{ display:flex; flex-direction:column; gap:8px; }
+  .faq details{
+    background:#fff;
+    border:1px solid var(--glass-border);
+    border-radius:var(--radius-md);
+    padding:14px 18px;
+  }
+  .faq summary{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:14.5px;
+    font-weight:600;
+    cursor:pointer;
+    list-style:none;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .faq summary::-webkit-details-marker{ display:none; }
+  .faq summary::after{
+    content:"+";
+    font-size:18px;
+    color:var(--violet);
+    font-weight:400;
+    flex-shrink:0;
+    margin-left:12px;
+  }
+  .faq details[open] summary::after{ content:"−"; }
+  .faq p{
+    font-size:13.5px;
+    color:var(--muted);
+    line-height:1.6;
+    margin:10px 0 2px;
+  }
+
+  @media (max-width:640px){
+    .steps{ grid-template-columns:1fr; }
   }
 
   a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, div[tabindex]:focus-visible{
@@ -438,6 +677,8 @@
     #preview{ grid-template-columns:repeat(auto-fill, minmax(140px,1fr)); gap:10px; }
     .actions{ flex-direction:column; }
     .actions button{ width:100%; }
+    .support-card{ flex-direction:column; align-items:flex-start; text-align:left; }
+    .support-card .coffee{ width:100%; justify-content:center; }
   }
 
   @media (max-width:480px){
@@ -465,15 +706,12 @@
       </div>
       <span>Squeeze</span>
     </div>
-    <a class="coffee" href="https://www.buymeacoffee.com/yourname" target="_blank" rel="noopener">
-      <span class="emoji">☕</span> Buy me a coffee
-    </a>
   </div>
 
   <div class="hero">
-    <div class="eyebrow"><span class="dot"></span> Runs 100% in your browser</div>
-    <h1>Shrink your photos <em>without shrinking</em> the quality.</h1>
-    <p>Drop in a batch, pick a size and quality, export. Nothing is uploaded — the resizing happens on your device.</p>
+    <div class="eyebrow"><span class="dot"></span> 100% secure — everything stays in your browser</div>
+    <h1>Squeeze the <em>size</em> out of your photos.</h1>
+    <p>Drop in a batch, drag the quality slider until size and sharpness feel right, and export instantly. Nothing ever leaves your device.</p>
     <div class="trust-row">
       <span>100% free</span>
       <span>No uploads</span>
@@ -484,8 +722,11 @@
 
   <div class="controls">
     <div class="dial">
-      <label for="maxSize">Max dimension</label>
-      <input type="number" id="maxSize" value="1500" min="50"> 
+      <div class="dial-head">
+        <label for="maxSize">Max dimension (px)</label>
+      </div>
+      <input type="number" id="maxSize" value="1500" min="50">
+      <div class="dial-caption">The longest side of the photo — width or height, whichever is bigger.</div>
     </div>
     <div class="dial">
       <div class="dial-head">
@@ -529,11 +770,74 @@
 
   <div class="actions">
     <button id="downloadAll" disabled>Download all (.zip)</button>
-    <button id="clearAll" style="display:none;">Clear all</button>
+    <button id="downloadSeparate" class="ghost-btn" disabled>Download all separately</button>
+    <button id="clearAll" class="ghost-btn" style="display:none;">Clear all</button>
   </div>
 
+  <div class="support-card">
+    <p>If it saved you some time, you can support the project with a small tip ☕<br>It helps me keep the tool free and improve it.</p>
+    <a class="coffee" href="https://www.buymeacoffee.com/yourname" target="_blank" rel="noopener">
+      <span class="emoji">☕</span> Buy me a coffee
+    </a>
+  </div>
+
+  <a class="idea-link" href="mailto:youremail@example.com?subject=Idea%20for%20a%20new%20tool">
+    ✉️ Got an idea for another free tool? Send me a note
+  </a>
+
+  <section class="info-section">
+    <h2>How it works</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Drop your photos</h3>
+        <p>JPG, PNG, or WebP — drag in as many as you want, or click to pick files.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>Adjust size and quality</h3>
+        <p>Drag the sliders and watch the file size update live for every image.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>Download</h3>
+        <p>Grab everything as a ZIP, or download each file separately.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="info-section">
+    <h2>Frequently asked questions</h2>
+    <div class="faq">
+      <details>
+        <summary>Is Squeeze really free?</summary>
+        <p>Yes. There's no sign-up, no watermark, no limit on how many images you can process, and no hidden paywall.</p>
+      </details>
+      <details>
+        <summary>Do you upload or store my photos?</summary>
+        <p>No. Every image is resized and compressed locally in your browser using JavaScript. Nothing is ever sent to a server, and nothing is stored after you close the tab.</p>
+      </details>
+      <details>
+        <summary>What does "max dimension" mean?</summary>
+        <p>It's the longest side of the photo, whichever is bigger — width or height. If you set it to 1500px, a 4000×3000 photo becomes 1500×1125.</p>
+      </details>
+      <details>
+        <summary>Will resizing reduce the image quality?</summary>
+        <p>Some quality loss is unavoidable when a file gets smaller. The quality slider lets you control that trade-off directly and shows the resulting file size live, so you can stop wherever it still looks right.</p>
+      </details>
+      <details>
+        <summary>What image formats are supported?</summary>
+        <p>You can upload JPG, PNG, and WebP files, and export the result as JPEG, PNG, or WebP.</p>
+      </details>
+      <details>
+        <summary>Can I use this on my phone?</summary>
+        <p>Yes, the tool is fully responsive and works on mobile browsers. You can download results as a single ZIP or as separate files.</p>
+      </details>
+    </div>
+  </section>
+
   <div class="footer-note">
-    Processed entirely client-side using the Canvas API. Close this tab and everything's gone — nothing is stored or sent to a server.
+    Everything happens right here in your browser. Close this tab and it's all gone — nothing is stored or sent to a server.
   </div>
 
 </div>
@@ -546,6 +850,7 @@
   const ctx = canvas.getContext("2d");
   const preview = document.getElementById("preview");
   const downloadAll = document.getElementById("downloadAll");
+  const downloadSeparate = document.getElementById("downloadSeparate");
   const clearAll = document.getElementById("clearAll");
   const counter = document.getElementById("counter");
   const counterValue = document.getElementById("counterValue");
@@ -615,11 +920,23 @@
       counter.style.display = "none";
       clearAll.style.display = "none";
       downloadAll.disabled = true;
+      downloadSeparate.disabled = true;
+      downloadAll.textContent = "Download all (.zip)";
+      downloadSeparate.style.display = "inline-block";
       return;
     }
     counter.style.display = "flex";
     clearAll.style.display = "inline-block";
     downloadAll.disabled = false;
+    downloadSeparate.disabled = false;
+
+    if(processedImages.length === 1){
+      downloadAll.textContent = "Download image";
+      downloadSeparate.style.display = "none";
+    } else {
+      downloadAll.textContent = "Download all (.zip)";
+      downloadSeparate.style.display = "inline-block";
+    }
 
     const totalOrig = processedImages.reduce((s,i)=>s+i.originalSize,0);
     const totalNew = processedImages.reduce((s,i)=>s+i.newSize,0);
@@ -743,6 +1060,16 @@
 
   downloadAll.addEventListener("click", async () => {
     if (processedImages.length === 0) return;
+
+    if (processedImages.length === 1) {
+      const item = processedImages[0];
+      const a = document.createElement("a");
+      a.href = item.url;
+      a.download = item.name;
+      a.click();
+      return;
+    }
+
     const original = downloadAll.textContent;
     downloadAll.textContent = "Zipping…";
     downloadAll.disabled = true;
@@ -758,6 +1085,18 @@
       downloadAll.textContent = original;
       downloadAll.disabled = false;
     }
+  });
+
+  downloadSeparate.addEventListener("click", () => {
+    if (processedImages.length === 0) return;
+    processedImages.forEach((item, i) => {
+      setTimeout(() => {
+        const a = document.createElement("a");
+        a.href = item.url;
+        a.download = item.name;
+        a.click();
+      }, i * 250);
+    });
   });
 
   clearAll.addEventListener("click", () => {
